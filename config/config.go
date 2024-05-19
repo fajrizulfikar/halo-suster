@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/joho/godotenv"
@@ -30,10 +31,11 @@ type DBConfig struct {
 }
 
 func Load(ctx context.Context) (*Config, error) {
-	// load .env file
-	err := godotenv.Load()
-	if err != nil {
-		return nil, err
+	if os.Getenv("GITHUB_ACTIONS") != "true" {
+		err := godotenv.Load()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	var cfg Config
