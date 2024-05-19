@@ -51,7 +51,10 @@ FROM alpine
 WORKDIR /app
 
 COPY --from=builder /main .
-COPY --from=builder .env .env
+
+RUN ls -al
+
+COPY .env .env
 
 # Expose port 8080 for the container
 EXPOSE 8080
