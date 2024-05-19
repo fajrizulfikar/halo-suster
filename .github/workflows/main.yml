@@ -12,28 +12,9 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
 
-    env:
-      DB_NAME: ${{ secrets.DB_NAME }}
-      DB_PORT: ${{ secrets.DB_PORT }}
-      DB_HOST: ${{ secrets.DB_HOST }}
-      DB_USERNAME: ${{ secrets.DB_USERNAME }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      DB_PARAMS: ${{ secrets.DB_PARAMS }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      BCRYPT_SALT: ${{ secrets.BCRYPT_SALT }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-
-    - name: Debug Environment Variables
-      run: |
-        echo "GITHUB_ACTIONS=$GITHUB_ACTIONS"
-        env
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -54,7 +35,20 @@ jobs:
         IMAGE_TAG: latest
       run: |
         # Build a docker container and push it to ECR 
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker build \
+        --build-arg DB_NAME=${{ secrets.DB_NAME }} \
+        --build-arg DB_PORT=${{ secrets.DB_PORT }} \
+        --build-arg DB_HOST=${{ secrets.DB_HOST }} \
+        --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
+        --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+        --build-arg DB_PARAMS=${{ secrets.DB_PARAMS }} \
+        --build-arg JWT_SECRET=${{ secrets.JWT_SECRET }} \
+        --build-arg BCRYPT_SALT=${{ secrets.BCRYPT_SALT }} \
+        --build-arg AWS_REGION=${{ secrets.AWS_REGION }} \
+        --build-arg AWS_S3_BUCKET_NAME=${{ secrets.AWS_S3_BUCKET_NAME }} \
+        --build-arg AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+        --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+        -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         echo "Pushing image to ECR..."
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"

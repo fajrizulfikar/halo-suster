@@ -3,7 +3,6 @@ package config
 import (
 	"context"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/joho/godotenv"
@@ -31,17 +30,11 @@ type DBConfig struct {
 }
 
 func Load(ctx context.Context) (*Config, error) {
-	if os.Getenv("GITHUB_ACTIONS") != "true" {
-		err := godotenv.Load()
-		if err != nil {
-			return nil, err
-		}
+	err := godotenv.Load()
+	if err != nil {
+		return nil, err
 	}
 
-	fmt.Println("Environment variables:")
-	for _, e := range os.Environ() {
-		fmt.Println(e)
-	}
 	var cfg Config
 	if err := envconfig.Process(ctx, &cfg); err != nil {
 		return nil, err
