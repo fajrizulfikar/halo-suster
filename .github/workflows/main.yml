@@ -30,6 +30,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
+    - name: Debug Environment Variables
+      run: |
+        echo "GITHUB_ACTIONS=$GITHUB_ACTIONS"
+        env
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:

@@ -38,6 +38,10 @@ func Load(ctx context.Context) (*Config, error) {
 		}
 	}
 
+	fmt.Println("Environment variables:")
+	for _, e := range os.Environ() {
+		fmt.Println(e)
+	}
 	var cfg Config
 	if err := envconfig.Process(ctx, &cfg); err != nil {
 		return nil, err
